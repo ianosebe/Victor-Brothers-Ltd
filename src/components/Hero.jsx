@@ -1,13 +1,23 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Hero = () => {
   return (
-    <div className="relative h-screen w-full bg-gradient-to-b from-premiumBlack via-gray-900 to-premiumBlack overflow-hidden flex items-center justify-center">
+    <div className="relative h-screen w-full bg-premiumBlack overflow-hidden flex items-center justify-center">
       
       {/* Background Elements */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gray-800/20 via-transparent to-transparent opacity-50"></div>
+      <div className="absolute inset-0">
+        <img 
+          src="/home-bg.png" 
+          alt="Dealership Cars" 
+          className="w-full h-full object-cover"
+        />
+      </div>
+      
+      {/* Bottom gradient specifically for the scrolling cards visibility */}
+      <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-premiumBlack to-transparent pointer-events-none"></div>
       
       {/* Content */}
       <div className="relative z-10 text-center px-4 max-w-5xl mx-auto -mt-24">
@@ -15,7 +25,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.2 }}
-          className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter text-white mb-6"
+          className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter text-black mb-6 drop-shadow-md"
         >
           PURE <span className="text-premiumRed">ADRENALINE.</span>
         </motion.h1>
@@ -24,20 +34,24 @@ const Hero = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.4 }}
-          className="text-lg md:text-2xl text-gray-400 mb-10 max-w-2xl mx-auto"
+          className="text-lg md:text-2xl text-black font-semibold mb-10 max-w-2xl mx-auto drop-shadow-sm"
         >
           Experience the pinnacle of automotive engineering and design. The future of speed is here at Victor & Brother's Ltd.
         </motion.p>
         
-        <motion.button
+        <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.6 }}
-          className="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-white transition-all duration-200 bg-premiumRed border border-transparent rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-premiumRed"
         >
-          Discover Models
-          <ChevronRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-        </motion.button>
+          <Link
+            to="/models"
+            className="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-white transition-all duration-200 bg-premiumRed border border-transparent rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-premiumRed"
+          >
+            Discover Models
+            <ChevronRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </motion.div>
       </div>
 
       {/* Infinite scrolling cards */}

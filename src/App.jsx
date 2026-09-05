@@ -1,21 +1,24 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import Hero from './components/Hero';
+import Home from './pages/Home';
+import Models from './pages/Models';
+import About from './pages/About';
+
 
 function App() {
   return (
-    <div className="min-h-screen bg-premiumBlack">
-      <Navbar />
-      <Hero />
-      
-      {/* Placeholder for other sections */}
-      <section className="py-20 px-4 text-center">
-        <h2 className="text-3xl font-bold text-white mb-6">Engineered for Perfection</h2>
-        <p className="text-gray-400 max-w-2xl mx-auto">
-          Scroll down to discover our lineup of exclusive supercars.
-        </p>
-      </section>
-    </div>
+    <Router>
+      <div className="min-h-screen bg-premiumBlack">
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/models" element={<Models />} />
+          <Route path="/about" element={<About />} />
+          <Route path="*" element={<div className="pt-40 text-white text-center text-2xl">Page Not Found. <br/> URL: {window.location.pathname}</div>} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
