@@ -169,9 +169,9 @@ const Home = () => {
               Our team is ready to assist you in making your dream car a reality. Get in touch with us to schedule a viewing or discuss financing options.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <a href="tel:+254700000000" className="flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-premiumRed text-white font-bold uppercase tracking-wider rounded-full hover:bg-red-700 transition-colors shadow-lg shadow-premiumRed/30">
-                <Phone className="w-5 h-5 mr-2" /> Call Sales
-              </a>
+              <Link to="/contact" className="flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-premiumRed text-white font-bold uppercase tracking-wider rounded-full hover:bg-red-700 transition-colors shadow-lg shadow-premiumRed/30">
+                <Phone className="w-5 h-5 mr-2" /> Contact Us
+              </Link>
               <Link to="/models" className="flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-transparent border-2 border-white text-white font-bold uppercase tracking-wider rounded-full hover:bg-white hover:text-black transition-colors">
                 Browse Models
               </Link>

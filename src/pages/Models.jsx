@@ -1,141 +1,38 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../firebase';
 
 const Models = () => {
-  // Data for models
-  const models = [
-    { 
-      id: 1, 
-      name: 'Toyota Sienta', 
-      year: '2019',
-      features: ['Fully loaded', '2WD', '1500cc'],
-      price: '1.65M',
-      image: '/toyota-sienta.png'
-    },
-    {
-      id: 2,
-      name: 'Toyota Rav4',
-      year: '2007',
-      features: ['4WD', '2400cc', 'Automatic', 'Accident Free'],
-      price: '1.45M',
-      image: '/toyota-rav4.png'
-    },
-    {
-      id: 3,
-      name: 'Toyota Harrier',
-      year: '2014',
-      features: ['2000cc', 'Petrol', 'Sunroof', 'Quick Sale'],
-      price: '2.35M',
-      image: '/toyota-harrier.png'
-    },
-    {
-      id: 4,
-      name: 'Land Cruiser Mabati',
-      year: '2017',
-      features: ['Zero accident', 'Extremely clean', 'New Registration'],
-      price: '4.6M',
-      image: '/land-cruiser-mabati.png'
-    },
-    {
-      id: 5,
-      name: 'Land Rover Discovery 4',
-      year: '2013',
-      features: ['Diesel', 'Automatic', 'Leather', 'Rotor gear'],
-      price: '3.5M',
-      image: '/discovery-4.png'
-    },
-    {
-      id: 6,
-      name: 'Nissan Hardbody',
-      year: '2015',
-      features: ['Locally Assembled', '4WD optional', 'Very Clean'],
-      price: '1.55M',
-      image: '/nissan-hardbody.png'
-    },
-    {
-      id: 7,
-      name: 'Land Cruiser Prado J150',
-      year: '2014',
-      features: ['7 Seater', '2700cc', 'Petrol', 'Fully Loaded'],
-      price: '3.3M',
-      image: '/prado-j150.png'
-    },
-    {
-      id: 8,
-      name: 'Subaru Outback BP9',
-      year: '2007',
-      features: ['2500cc', 'Petrol', '120k kms', '1 Owner'],
-      price: '980K',
-      image: '/subaru-outback.png'
-    },
-    {
-      id: 9,
-      name: 'Honda CR-V',
-      year: '2007',
-      features: ['2400cc', 'Petrol', 'Automatic', 'Accident free'],
-      price: '1.34M',
-      image: '/honda-crv.png'
-    },
-    {
-      id: 10,
-      name: 'Toyota Fielder',
-      year: '2007',
-      features: ['1800cc', 'Nairobi'],
-      price: '880K',
-      image: '/toyota-fielder.png'
-    },
-    {
-      id: 11,
-      name: 'Nissan X-Trail',
-      year: '2011',
-      features: ['2.0L', 'Original Paint', 'Leather', '4x4'],
-      price: '1.28M',
-      image: '/nissan-xtrail.png'
-    },
-    {
-      id: 12,
-      name: 'Toyota Landcruiser ZX',
-      year: '2018',
-      features: ['Unregistered', 'V8 Engine', 'Premium', '4WD'],
-      price: '10.5M',
-      image: '/land-cruiser-zx.png'
-    },
-    {
-      id: 13,
-      name: 'Ford Ranger Pickup',
-      year: '2018',
-      features: ['Manual-Diesel', '2200cc', 'Closed Cabin', '129k kms'],
-      price: '2.05M',
-      image: '/ford-ranger.png'
-    },
-    {
-      id: 14,
-      name: 'Mercedes Benz W205',
-      year: '2014',
-      features: ['AMG Line', '1990cc', 'Leather', 'Sensors'],
-      price: '2.54M',
-      image: '/mercedes-c200.png'
-    },
-    {
-      id: 15,
-      name: 'Toyota Rav 4 Adventure',
-      year: '2019',
-      features: ['2000cc Petrol', 'Panoramic Sunroof', '57,000kms', 'Unregistered'],
-      price: '4.57M',
-      image: '/toyota-rav4-adventure.png'
-    },
-    {
-      id: 16,
-      name: 'Volkswagen Tiguan',
-      year: '2012',
-      features: ['2.0L TSI', 'Automatic', 'New Suspension', 'Fully Serviced'],
-      price: '1.45M',
-      image: '/vw-tiguan.png'
-    }
-  ];
+  const [models, setModels] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchModels = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'cars'));
+        const carsList = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setModels(carsList);
+      } catch (error) {
+        console.error("Error fetching models:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchModels();
+  }, []);
+
+  if (loading) {
+    return <div className="pt-24 min-h-screen bg-premiumBlack text-white text-center text-xl font-bold">Loading Vehicles...</div>;
+  }
 
   return (
     <div className="pt-24 min-h-screen bg-premiumBlack px-4 sm:px-6 lg:px-8 pb-20">
+
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -173,6 +70,12 @@ const Models = () => {
               
               {/* Gradient overlay for contrast */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent pointer-events-none"></div>
+
+              {model.status === 'sold' && (
+                <div className="absolute top-4 right-4 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded shadow-lg transform rotate-12 z-10">
+                  SOLD
+                </div>
+              )}
               
               {/* Description Box Overlay */}
               <div className="absolute bottom-0 left-0 right-0 p-3">
@@ -195,10 +98,13 @@ const Models = () => {
                   
                   <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
                     <div className="text-sm font-black text-gray-900">Ksh {model.price}</div>
-                    <button className="bg-black text-[10px] font-bold text-premiumRed hover:bg-gray-800 uppercase tracking-wider flex items-center px-2.5 py-1.5 rounded-md transition-colors">
+                    <Link 
+                      to={`/models/${model.id}`}
+                      className="bg-black text-[10px] font-bold text-premiumRed hover:bg-gray-800 uppercase tracking-wider flex items-center px-2.5 py-1.5 rounded-md transition-colors"
+                    >
                       Details
                       <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
-                    </button>
+                    </Link>
                   </div>
 
                 </div>
