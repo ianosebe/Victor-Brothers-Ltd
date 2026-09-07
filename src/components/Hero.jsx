@@ -38,7 +38,7 @@ const Hero = () => {
           transition={{ duration: 1, delay: 0.4 }}
           className="text-lg md:text-2xl text-white font-medium mb-10 max-w-2xl mx-auto drop-shadow-2xl"
         >
-          Find, test, and buy top-tier secondhand vehicles from a family dealership that puts you first.
+          Find, test, and buy top-tier secondhand vehicles from a dealership that puts you first.
         </motion.p>
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
