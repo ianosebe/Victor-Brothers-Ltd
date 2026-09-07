@@ -1,31 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Hero from '../components/Hero';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ShieldCheck, Zap, Award, Phone } from 'lucide-react';
+import { collection, getDocs, limit, query } from 'firebase/firestore';
+import { db } from '../firebase';
 
 const Home = () => {
-  // A few featured cars to showcase on the homepage
-  const featuredCars = [
-    {
-      id: 7,
-      name: 'Land Cruiser Prado J150',
-      price: '3.3M',
-      image: '/prado-j150.png'
-    },
-    {
-      id: 11,
-      name: 'Nissan X-Trail',
-      price: '1.28M',
-      image: '/nissan-xtrail.png'
-    },
-    {
-      id: 4,
-      name: 'Land Cruiser Mabati',
-      price: '4.6M',
-      image: '/land-cruiser-mabati.png'
-    }
-  ];
+  const [featuredCars, setFeaturedCars] = useState([]);
+
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      try {
+        // Just fetch the first 3 cars to feature
+        const q = query(collection(db, 'cars'), limit(3));
+        const snapshot = await getDocs(q);
+        const cars = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+        setFeaturedCars(cars);
+      } catch (error) {
+        console.error("Error fetching featured cars:", error);
+      }
+    };
+    fetchFeatured();
+  }, []);
 
   return (
     <div className="bg-premiumBlack min-h-screen pt-20 md:pt-0">
@@ -135,6 +132,12 @@ const Home = () => {
                   </div>
                 </div>
               </div>
+              
+              <div className="mt-10">
+                <Link to="/experience" className="inline-flex items-center text-premiumRed font-bold hover:text-white transition-colors uppercase tracking-wider text-sm">
+                  Discover Our Full Process <ArrowRight className="w-4 h-4 ml-2" />
+                </Link>
+              </div>
             </motion.div>
             
             <motion.div
@@ -186,7 +189,7 @@ const Home = () => {
           <h3 className="text-xl font-bold text-white tracking-wider uppercase mb-4">
             Victor <span className="text-premiumRed">&</span> Brother's Ltd
           </h3>
-          <p className="text-gray-600 text-sm mb-6">Premium refurbished and secondhand vehicles.</p>
+          <p className="text-gray-600 text-sm mb-6">Premium secondhand vehicles.</p>
           <p className="text-gray-800 text-xs">&copy; {new Date().getFullYear()} Victor & Brother's Ltd. All rights reserved.</p>
         </div>
       </footer>

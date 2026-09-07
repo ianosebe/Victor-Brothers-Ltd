@@ -25,7 +25,7 @@ export const cars = [
   },
   {
     id: 4,
-    name: 'Land Cruiser Mabati',
+    name: 'Toyota Land Cruiser 79 Series Pickup',
     year: '2017',
     features: ['Zero accident', 'Extremely clean', 'New Registration'],
     price: '4.6M',

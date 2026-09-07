@@ -62,7 +62,7 @@ const Contact = () => {
                 <MessageCircle className="w-8 h-8 text-premiumRed" />
               </div>
               <div className="ml-6">
-                <h3 className="text-xl font-bold text-white mb-1">Phone / WhatsApp</h3>
+                <h3 className="text-xl font-bold text-white mb-1">WhatsApp</h3>
                 <p className="text-gray-400">0748 448 411</p>
                 <p className="text-sm text-premiumRed mt-2 font-medium uppercase tracking-wider">Click to chat</p>
               </div>

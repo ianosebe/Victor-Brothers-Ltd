@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Models from './pages/Models';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import Experience from './pages/Experience';
 import CarDetails from './pages/CarDetails';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
@@ -19,6 +20,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/models" element={<Models />} />
           <Route path="/models/:id" element={<CarDetails />} />
+          <Route path="/experience" element={<Experience />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/admin" element={<AdminLogin />} />

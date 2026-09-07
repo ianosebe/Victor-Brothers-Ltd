@@ -14,6 +14,8 @@ const Hero = () => {
           alt="Dealership Cars" 
           className="w-full h-full object-cover"
         />
+        {/* Dark overlay to make text pop */}
+        <div className="absolute inset-0 bg-black/50"></div>
       </div>
       
       {/* Bottom gradient specifically for the scrolling cards visibility */}
@@ -25,20 +27,19 @@ const Hero = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.2 }}
-          className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter text-black mb-6 drop-shadow-md"
+          className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter text-white mb-6 drop-shadow-2xl"
         >
-          PURE <span className="text-premiumRed">ADRENALINE.</span>
+          WELCOME TO <span className="text-premiumRed drop-shadow-2xl">VICTOR & BROTHER'S</span>
         </motion.h1>
         
         <motion.p 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.4 }}
-          className="text-lg md:text-2xl text-black font-semibold mb-10 max-w-2xl mx-auto drop-shadow-sm"
+          className="text-lg md:text-2xl text-white font-medium mb-10 max-w-2xl mx-auto drop-shadow-2xl"
         >
-          Experience the pinnacle of automotive engineering and design. The future of speed is here at Victor & Brother's Ltd.
+          Find, test, and buy top-tier secondhand vehicles from a family dealership that puts you first.
         </motion.p>
-        
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}

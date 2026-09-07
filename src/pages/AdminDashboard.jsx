@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { db, auth } from '../firebase';
+import { db, auth, storage } from '../firebase';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { signOut } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { cars as initialCars } from '../data/cars';
@@ -9,6 +10,7 @@ const AdminDashboard = () => {
   const [vehicles, setVehicles] = useState([]);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [activeTab, setActiveTab] = useState('inventory');
   const navigate = useNavigate();
 
@@ -25,10 +27,10 @@ const AdminDashboard = () => {
         getDocs(collection(db, 'messages'))
       ]);
       
-      setVehicles(carsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      setVehicles(carsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })));
       
       // Sort messages by createdAt descending if it exists
-      const msgs = msgsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const msgs = msgsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
       msgs.sort((a, b) => {
         const timeA = a.createdAt?.seconds || 0;
         const timeB = b.createdAt?.seconds || 0;
@@ -93,6 +95,24 @@ const AdminDashboard = () => {
       setFormData({ name: '', year: '', price: '', image: '', features: '', status: 'available' });
     }
     setIsModalOpen(true);
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const fileRef = ref(storage, `vehicles/${Date.now()}_${file.name}`);
+      await uploadBytes(fileRef, file);
+      const url = await getDownloadURL(fileRef);
+      setFormData(prev => ({ ...prev, image: url }));
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      alert("Failed to upload image. Please try again.");
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const handleFormSubmit = async (e) => {
@@ -256,8 +276,21 @@ const AdminDashboard = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-gray-400 text-xs uppercase mb-1">Image URL/Path</label>
-                <input required type="text" className="w-full bg-black border border-gray-700 rounded p-2 text-white" value={formData.image} onChange={e => setFormData({...formData, image: e.target.value})} />
+                <label className="block text-gray-400 text-xs uppercase mb-1">Vehicle Image</label>
+                <div className="flex flex-col gap-2">
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="w-full bg-black border border-gray-700 rounded p-2 text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-premiumRed file:text-white hover:file:bg-red-700"
+                  />
+                  {uploadingImage && <span className="text-sm text-premiumRed">Uploading image...</span>}
+                  {formData.image && !uploadingImage && (
+                    <img src={formData.image} alt="Preview" className="h-32 object-cover rounded mt-2 border border-gray-700" />
+                  )}
+                  {/* Keep hidden input to ensure required validation passes */}
+                  <input type="hidden" required value={formData.image} />
+                </div>
               </div>
               <div>
                 <label className="block text-gray-400 text-xs uppercase mb-1">Features (comma separated)</label>
@@ -265,7 +298,9 @@ const AdminDashboard = () => {
               </div>
               <div className="flex justify-end gap-3 mt-6">
                 <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded text-gray-400 hover:text-white">Cancel</button>
-                <button type="submit" className="bg-premiumRed hover:bg-red-700 px-4 py-2 rounded font-bold text-white">Save Vehicle</button>
+                <button disabled={uploadingImage} type="submit" className="bg-premiumRed hover:bg-red-700 px-4 py-2 rounded font-bold text-white disabled:opacity-50">
+                  {uploadingImage ? 'Uploading...' : 'Save Vehicle'}
+                </button>
               </div>
             </form>
           </div>

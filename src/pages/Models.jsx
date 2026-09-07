@@ -13,8 +13,8 @@ const Models = () => {
       try {
         const querySnapshot = await getDocs(collection(db, 'cars'));
         const carsList = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
+          ...doc.data(),
+          id: doc.id
         }));
         setModels(carsList);
       } catch (error) {
@@ -112,12 +112,7 @@ const Models = () => {
             </div>
           ))}
           
-          {/* Empty slot placeholder for future cars to maintain grid */}
-          <div
-            className="bg-white/5 border-2 border-dashed border-gray-600 rounded-xl flex flex-col items-center justify-center w-full h-72 sm:h-80 md:h-64 lg:h-72 text-center p-4"
-          >
-            <p className="text-gray-400 font-medium text-sm">More models coming soon...</p>
-          </div>
+          
         </div>
       </div>
     </div>
