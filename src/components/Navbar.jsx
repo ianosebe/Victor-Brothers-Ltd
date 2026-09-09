@@ -22,49 +22,75 @@ const Navbar = () => {
   ];
 
   return (
-    <motion.nav 
+    <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.8, ease: 'easeOut' }}
-      className="fixed w-full z-50 pt-4"
+      className="fixed w-full z-50"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-24 relative">
           {/* Logo */}
-          <div className="flex items-center">
-            <Link to="/" className="flex items-center drop-shadow-md hover:scale-105 transition-transform duration-300">
-              <img src="/shield-logo.png" alt="Victor & Brother's Ltd" className="h-16 md:h-20 w-auto object-contain" />
+          <div className="flex items-stretch self-stretch">
+            <Link
+              to="/"
+              className="flex items-center hover:opacity-90 transition-opacity duration-300"
+            >
+              <img
+                src="/vb-logo.png"
+                alt="Victor & Brothers Ltd"
+                className="h-24 w-auto object-contain"
+                style={{ mixBlendMode: 'lighten' }}
+              />
             </Link>
           </div>
           
-          {/* Glassmorphic Navigation Rectangle - Centered (Desktop) */}
-          <div className="hidden md:flex items-center space-x-1 bg-white/5 backdrop-blur-xl border border-white/10 px-6 py-2.5 rounded-2xl shadow-inner absolute left-1/2 -translate-x-1/2">
+          {/* Navigation Links — clean, no box (Desktop) */}
+          <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
             {navItems.map((item) => {
               const isActive = activeTab === item.path || (item.path === '/' && activeTab === '');
               return (
                 <Link 
                   key={item.name} 
                   to={item.path} 
-                  className={`px-4 py-2 rounded-xl transition-all duration-300 text-sm font-bold tracking-wider uppercase ${
-                    isActive 
-                      ? 'text-premiumRed bg-white/10 shadow-sm' 
-                      : 'text-gray-300 hover:text-white hover:bg-white/5'
-                  }`}
+                  className="relative group flex flex-col items-center pb-1"
                 >
-                  {item.name}
+                  <span 
+                    className={`text-sm font-bold tracking-widest uppercase transition-colors duration-300 ${
+                      isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'
+                    }`}
+                  >
+                    {item.name}
+                  </span>
+
+                  {/* Animated red underline indicator */}
+                  <motion.span
+                    layoutId="nav-indicator"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-premiumRed rounded-full"
+                    style={{ opacity: isActive ? 1 : 0 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  />
+
+                  {/* Hover underline (inactive links only) */}
+                  {!isActive && (
+                    <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-white/25 rounded-full group-hover:w-full transition-all duration-300" />
+                  )}
                 </Link>
               );
             })}
           </div>
 
-          {/* Right Side - Contact & Mobile Toggle */}
+          {/* Right Side — Contact & Mobile Toggle */}
           <div className="flex items-center gap-4">
-            <Link to="/contact" className="hidden sm:inline-flex items-center justify-center px-6 py-2.5 bg-premiumRed text-white font-bold uppercase tracking-wider rounded-full hover:bg-red-700 transition-colors shadow-lg shadow-premiumRed/20 text-sm">
+            <Link 
+              to="/contact" 
+              className="hidden sm:inline-flex items-center justify-center px-6 py-2.5 bg-premiumRed text-white font-bold uppercase tracking-wider rounded-full hover:bg-red-600 transition-all duration-300 shadow-lg shadow-premiumRed/20 hover:shadow-premiumRed/40 hover:-translate-y-0.5 text-sm"
+            >
               Contact Us
             </Link>
             <button 
               onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden text-white p-2 rounded-lg bg-white/5 backdrop-blur-md border border-white/10"
+              className="md:hidden text-white p-2 hover:text-premiumRed transition-colors duration-200"
             >
               {isOpen ? <X className="w-6 h-6 text-premiumRed" /> : <Menu className="w-6 h-6" />}
             </button>

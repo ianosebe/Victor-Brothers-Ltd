@@ -8,7 +8,7 @@ const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyD-NjeS_NoFzxYGxRIuqAqR4kkuphJOwmM",
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "victor-brothers-ltd.firebaseapp.com",
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "victor-brothers-ltd",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "victor-brothers-ltd.firebasestorage.app",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "victor-brothers-ltd.appspot.com",
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "975695716309",
   appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:975695716309:web:23357bc25815c8f75ba75c",
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-9NY1K0RZ16"

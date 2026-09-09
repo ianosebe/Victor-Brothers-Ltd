@@ -1,81 +1,91 @@
-import React, { useState, useEffect } from 'react';
-import { db, auth, storage } from '../firebase';
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { signOut } from 'firebase/auth';
-import { useNavigate } from 'react-router-dom';
-import { cars as initialCars } from '../data/cars';
+import React, { useState, useEffect } from "react";
+import { db, auth, storage } from "../firebase";
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { signOut } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import { cars as initialCars } from "../data/cars";
+import {
+  LayoutGrid, MessageSquare, LogOut, Plus, Pencil, Trash2,
+  CheckCircle2, RotateCcw, Car, Users, TrendingUp, Database,
+  Upload, X, AlertTriangle, Mail, Phone as PhoneIcon, Clock,
+} from "lucide-react";
 
+/* ─── Small reusable stat card ─── */
+const StatCard = ({ icon: Icon, label, value, accent }) => (
+  <div className="bg-[#111111] border border-white/5 rounded-2xl p-5 flex items-center gap-4">
+    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${accent}`}>
+      <Icon className="w-6 h-6 text-white" />
+    </div>
+    <div>
+      <p className="text-2xl font-black text-white leading-none">{value}</p>
+      <p className="text-xs text-gray-500 mt-1 uppercase tracking-wider">{label}</p>
+    </div>
+  </div>
+);
+
+/* ─── Input field ─── */
+const Field = ({ label, children }) => (
+  <div>
+    <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">{label}</label>
+    {children}
+  </div>
+);
+
+const inputCls = "w-full bg-[#0a0a0a] border border-white/8 rounded-xl px-4 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-premiumRed/60 transition-colors";
+
+/* ══════════════════════════════════════════════════════════════ */
 const AdminDashboard = () => {
   const [vehicles, setVehicles] = useState([]);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [activeTab, setActiveTab] = useState('inventory');
+  const [activeTab, setActiveTab] = useState("inventory");
   const navigate = useNavigate();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState(null);
   const [formData, setFormData] = useState({
-    name: '', year: '', price: '', image: '', features: '', status: 'available'
+    name: "", year: "", price: "", image: "", features: "", status: "available",
   });
 
   const fetchData = async () => {
     try {
       const [carsSnapshot, msgsSnapshot] = await Promise.all([
-        getDocs(collection(db, 'cars')),
-        getDocs(collection(db, 'messages'))
+        getDocs(collection(db, "cars")),
+        getDocs(collection(db, "messages")),
       ]);
-      
-      setVehicles(carsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })));
-      
-      // Sort messages by createdAt descending if it exists
-      const msgs = msgsSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-      msgs.sort((a, b) => {
-        const timeA = a.createdAt?.seconds || 0;
-        const timeB = b.createdAt?.seconds || 0;
-        return timeB - timeA;
-      });
+      setVehicles(carsSnapshot.docs.map(d => ({ ...d.data(), id: d.id })));
+      const msgs = msgsSnapshot.docs.map(d => ({ ...d.data(), id: d.id }));
+      msgs.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
       setMessages(msgs);
-    } catch (error) {
-      console.error("Error fetching data:", error);
+    } catch (err) {
+      console.error("Error fetching data:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  useEffect(() => { fetchData(); }, []);
 
-  const handleLogout = async () => {
-    await signOut(auth);
-    navigate('/admin');
-  };
+  const handleLogout = async () => { await signOut(auth); navigate("/admin"); };
 
   const seedData = async () => {
-    if (window.confirm("Are you sure you want to seed the initial data? This will add all static cars to the database.")) {
-      setLoading(true);
-      for (const car of initialCars) {
-        await addDoc(collection(db, 'cars'), {
-          ...car,
-          status: 'available'
-        });
-      }
-      await fetchData();
-    }
+    if (!window.confirm("Seed initial car data into the database?")) return;
+    setLoading(true);
+    for (const car of initialCars) await addDoc(collection(db, "cars"), { ...car, status: "available" });
+    await fetchData();
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this vehicle?")) {
-      await deleteDoc(doc(db, 'cars', id));
-      await fetchData();
-    }
+    if (!window.confirm("Delete this vehicle permanently?")) return;
+    await deleteDoc(doc(db, "cars", id));
+    await fetchData();
   };
 
   const handleMarkSold = async (id, currentStatus) => {
-    const newStatus = currentStatus === 'sold' ? 'available' : 'sold';
-    await updateDoc(doc(db, 'cars', id), { status: newStatus });
+    const newStatus = currentStatus === "sold" ? "available" : "sold";
+    await updateDoc(doc(db, "cars", id), { status: newStatus });
     await fetchData();
   };
 
@@ -83,223 +93,441 @@ const AdminDashboard = () => {
     if (vehicle) {
       setEditingVehicle(vehicle);
       setFormData({
-        name: vehicle.name,
-        year: vehicle.year,
-        price: vehicle.price,
-        image: vehicle.image,
-        features: vehicle.features.join(', '),
-        status: vehicle.status || 'available'
+        name: vehicle.name, year: vehicle.year, price: vehicle.price,
+        image: vehicle.image, features: vehicle.features.join(", "), status: vehicle.status || "available",
       });
     } else {
       setEditingVehicle(null);
-      setFormData({ name: '', year: '', price: '', image: '', features: '', status: 'available' });
+      setFormData({ name: "", year: "", price: "", image: "", features: "", status: "available" });
     }
     setIsModalOpen(true);
   };
 
+  /* ── Browser-side image compression via Canvas API ── */
+  const compressImage = (file, { maxDimension = 1200, quality = 0.82 } = {}) =>
+    new Promise((resolve, reject) => {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+
+        // Calculate new dimensions keeping aspect ratio
+        let { width, height } = img;
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = Math.round((height / width) * maxDimension);
+            width = maxDimension;
+          } else {
+            width = Math.round((width / height) * maxDimension);
+            height = maxDimension;
+          }
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width  = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) return reject(new Error("Canvas toBlob failed"));
+            console.log(
+              `[Image Compression] ${file.name}: ` +
+              `${(file.size / 1024).toFixed(1)} KB → ` +
+              `${(blob.size / 1024).toFixed(1)} KB ` +
+              `(${Math.round((1 - blob.size / file.size) * 100)}% reduction)`
+            );
+            resolve(blob);
+          },
+          "image/jpeg",
+          quality
+        );
+      };
+
+      img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error("Image load failed")); };
+      img.src = objectUrl;
+    });
+
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     setUploadingImage(true);
     try {
-      const fileRef = ref(storage, `vehicles/${Date.now()}_${file.name}`);
-      await uploadBytes(fileRef, file);
+      // Compress before upload
+      const compressed = await compressImage(file);
+      const fileName = file.name.replace(/\.[^.]+$/, "") + "_compressed.jpg";
+      const fileRef = ref(storage, `vehicles/${Date.now()}_${fileName}`);
+      await uploadBytes(fileRef, compressed, { contentType: "image/jpeg" });
       const url = await getDownloadURL(fileRef);
       setFormData(prev => ({ ...prev, image: url }));
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      alert("Failed to upload image. Please try again.");
+    } catch (err) {
+      console.error("Upload error:", err);
+      const msg = err?.code ? `${err.code}: ${err.message}` : err.message;
+      alert(`Upload failed — ${msg}\n\nCheck the browser console for details.`);
     } finally {
       setUploadingImage(false);
     }
+
   };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    const carData = {
-      ...formData,
-      features: formData.features.split(',').map(f => f.trim()).filter(f => f),
-    };
-
+    const carData = { ...formData, features: formData.features.split(",").map(f => f.trim()).filter(Boolean) };
     try {
       if (editingVehicle) {
-        await updateDoc(doc(db, 'cars', editingVehicle.id), carData);
+        await updateDoc(doc(db, "cars", editingVehicle.id), carData);
       } else {
-        await addDoc(collection(db, 'cars'), carData);
+        await addDoc(collection(db, "cars"), carData);
       }
       setIsModalOpen(false);
       await fetchData();
-    } catch (error) {
-      console.error("Error saving vehicle:", error);
+    } catch (err) {
+      console.error("Save error:", err);
       alert("Error saving vehicle. Check console.");
     }
   };
 
-  if (loading) return <div className="min-h-screen bg-premiumBlack text-white pt-24 text-center">Loading...</div>;
+  const soldCount   = vehicles.filter(v => v.status === "sold").length;
+  const availCount  = vehicles.filter(v => v.status !== "sold").length;
+  const unreadCount = messages.filter(m => !m.read).length;
 
+  /* ── Loading screen ── */
+  if (loading) return (
+    <div className="min-h-screen bg-premiumBlack flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-12 h-12 border-2 border-premiumRed border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-gray-400 text-sm uppercase tracking-widest">Loading dashboard…</p>
+      </div>
+    </div>
+  );
+
+  /* ══════ RENDER ══════ */
   return (
-    <div className="min-h-screen bg-premiumBlack pt-24 px-4 sm:px-6 lg:px-8 pb-20">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-extrabold text-white">Admin <span className="text-premiumRed">Dashboard</span></h1>
-          <div className="flex gap-4">
-            <button onClick={handleLogout} className="bg-gray-800 text-white px-4 py-2 rounded font-bold hover:bg-gray-700 border border-gray-700">
-              Logout
-            </button>
-          </div>
+    <div className="min-h-screen bg-[#0a0a0a] flex">
+
+      {/* ── Sidebar ── */}
+      <aside className="hidden md:flex flex-col w-64 bg-[#0d0d0d] border-r border-white/5 fixed h-full z-10">
+        {/* Logo */}
+        <div className="px-6 py-5 border-b border-white/5">
+          <img src="/vb-logo.png" alt="Victor & Brothers" className="h-12 w-auto object-contain" style={{ mixBlendMode: "lighten" }} />
+          <p className="text-[10px] text-gray-600 mt-1.5 uppercase tracking-widest">Admin Portal</p>
         </div>
 
-        {/* Tabs */}
-        <div className="flex space-x-6 mb-8 border-b border-gray-800 pb-2">
-          <button 
-            onClick={() => setActiveTab('inventory')}
-            className={`font-bold pb-2 border-b-2 transition-colors ${activeTab === 'inventory' ? 'border-premiumRed text-premiumRed' : 'border-transparent text-gray-400 hover:text-white'}`}
-          >
-            Inventory ({vehicles.length})
-          </button>
-          <button 
-            onClick={() => setActiveTab('messages')}
-            className={`font-bold pb-2 border-b-2 transition-colors ${activeTab === 'messages' ? 'border-premiumRed text-premiumRed' : 'border-transparent text-gray-400 hover:text-white'}`}
-          >
-            Messages {messages.filter(m => !m.read).length > 0 && <span className="bg-premiumRed text-white text-xs px-2 py-0.5 rounded-full ml-2">{messages.filter(m => !m.read).length} new</span>}
-          </button>
-        </div>
-
-        {activeTab === 'inventory' && (
-          <div>
-            <div className="flex justify-end gap-4 mb-4">
-              {vehicles.length === 0 && (
-                <button onClick={seedData} className="bg-blue-600 text-white px-4 py-2 rounded font-bold hover:bg-blue-700">
-                  Seed Initial Data
-                </button>
+        {/* Nav tabs */}
+        <nav className="flex-1 p-4 space-y-1">
+          {[
+            { id: "inventory", label: "Inventory", icon: LayoutGrid, badge: vehicles.length },
+            { id: "messages",  label: "Messages",  icon: MessageSquare, badge: unreadCount > 0 ? unreadCount : null },
+          ].map(item => (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                activeTab === item.id
+                  ? "bg-premiumRed/10 text-premiumRed border border-premiumRed/20"
+                  : "text-gray-500 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              <item.icon className="w-4 h-4 flex-shrink-0" />
+              {item.label}
+              {item.badge != null && (
+                <span className={`ml-auto text-[10px] font-black px-2 py-0.5 rounded-full ${
+                  activeTab === item.id ? "bg-premiumRed text-white" : "bg-white/8 text-gray-400"
+                }`}>
+                  {item.badge}
+                </span>
               )}
-              <button onClick={() => openModal()} className="bg-premiumRed text-white px-4 py-2 rounded font-bold hover:bg-red-700">
-                Add Vehicle
-              </button>
-            </div>
-            <div className="bg-gray-900 rounded-xl overflow-hidden shadow-2xl border border-gray-800">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-gray-300">
-              <thead className="bg-black text-gray-400 uppercase text-xs font-semibold">
-                <tr>
-                  <th className="px-6 py-4">Vehicle</th>
-                  <th className="px-6 py-4">Year</th>
-                  <th className="px-6 py-4">Price</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-800">
-                {vehicles.map((v) => (
-                  <tr key={v.id} className="hover:bg-gray-800/50 transition-colors">
-                    <td className="px-6 py-4 flex items-center gap-3">
-                      <img src={v.image} alt={v.name} className="w-12 h-12 rounded object-cover bg-black" />
-                      <span className="font-medium text-white">{v.name}</span>
-                    </td>
-                    <td className="px-6 py-4">{v.year}</td>
-                    <td className="px-6 py-4 font-bold text-premiumRed">{v.price}</td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2 py-1 text-[10px] font-bold uppercase rounded ${v.status === 'sold' ? 'bg-red-900/50 text-red-400 border border-red-800' : 'bg-green-900/50 text-green-400 border border-green-800'}`}>
-                        {v.status || 'available'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right space-x-2">
-                      <button onClick={() => handleMarkSold(v.id, v.status)} className="text-xs bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-white">
-                        {v.status === 'sold' ? 'Mark Available' : 'Mark Sold'}
-                      </button>
-                      <button onClick={() => openModal(v)} className="text-xs bg-blue-600 hover:bg-blue-500 px-2 py-1 rounded text-white">Edit</button>
-                      <button onClick={() => handleDelete(v.id)} className="text-xs bg-red-600 hover:bg-red-500 px-2 py-1 rounded text-white">Delete</button>
-                    </td>
-                  </tr>
-                ))}
-                {vehicles.length === 0 && (
-                  <tr>
-                    <td colSpan="5" className="px-6 py-8 text-center text-gray-500">No vehicles found.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-        </div>
-        )}
+            </button>
+          ))}
+        </nav>
 
-        {activeTab === 'messages' && (
-          <div className="bg-gray-900 rounded-xl overflow-hidden shadow-2xl border border-gray-800 p-6 text-white">
-            <h2 className="text-xl font-bold mb-6">Customer Inquiries</h2>
-            {messages.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">No messages yet.</p>
-            ) : (
-              <div className="space-y-4">
-                {messages.map(msg => (
-                  <div key={msg.id} className="p-4 border rounded-xl border-gray-800 bg-black/50 hover:border-gray-600 transition-colors">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <h3 className="font-bold text-lg">{msg.name}</h3>
-                        <p className="text-sm text-premiumRed font-bold">{msg.phone}</p>
-                      </div>
-                      <span className="text-xs text-gray-500">
-                        {msg.createdAt?.toDate ? msg.createdAt.toDate().toLocaleString() : 'Just now'}
-                      </span>
-                    </div>
-                    <p className="text-gray-300 mt-3 whitespace-pre-wrap bg-gray-900/50 p-4 rounded-lg">{msg.message}</p>
-                  </div>
-                ))}
+        {/* Logout */}
+        <div className="p-4 border-t border-white/5">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-500 hover:text-white hover:bg-white/5 transition-all duration-200"
+          >
+            <LogOut className="w-4 h-4" /> Sign Out
+          </button>
+        </div>
+      </aside>
+
+
+      {/* ── Main content ── */}
+      <div className="flex-1 md:ml-64 min-h-screen">
+        <main className="px-6 md:px-10 py-10">
+
+          {/* ── Inventory header row ── */}
+          {activeTab === "inventory" && (
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h1 className="text-white font-black text-2xl leading-none">Inventory</h1>
+                <p className="text-gray-500 text-xs mt-1 uppercase tracking-widest">{vehicles.length} vehicles in database</p>
               </div>
-            )}
-          </div>
-        )}
+              <div className="flex items-center gap-3">
+                {vehicles.length === 0 && (
+                  <button
+                    onClick={seedData}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-bold rounded-xl transition-all"
+                  >
+                    <Database className="w-3.5 h-3.5" /> Seed Data
+                  </button>
+                )}
+                <button
+                  onClick={() => openModal()}
+                  className="relative flex items-center gap-2 px-6 py-3 bg-premiumRed hover:bg-red-600 text-white text-sm font-black rounded-xl transition-all duration-300 shadow-xl shadow-premiumRed/40 hover:shadow-premiumRed/60 hover:scale-105 active:scale-95"
+                >
+                  <span className="absolute inset-0 rounded-xl animate-ping bg-premiumRed opacity-20 pointer-events-none" />
+                  <Plus className="w-5 h-5" />
+                  Add Vehicle
+                </button>
+              </div>
+            </div>
+          )}
 
+          {/* ── Messages header row ── */}
+          {activeTab === "messages" && (
+            <div className="mb-8">
+              <h1 className="text-white font-black text-2xl leading-none">Customer Messages</h1>
+              <p className="text-gray-500 text-xs mt-1 uppercase tracking-widest">{messages.length} total inquiries</p>
+            </div>
+          )}
+
+          {/* ── Stat cards (inventory tab) ── */}
+          {activeTab === "inventory" && (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+              <StatCard icon={Car}         label="Total Vehicles" value={vehicles.length} accent="bg-premiumRed/80" />
+              <StatCard icon={CheckCircle2} label="Available"     value={availCount}      accent="bg-emerald-600/80" />
+              <StatCard icon={TrendingUp}   label="Sold"          value={soldCount}       accent="bg-amber-600/80" />
+              <StatCard icon={Users}        label="Inquiries"     value={messages.length} accent="bg-blue-600/80" />
+            </div>
+          )}
+
+          {/* ── Inventory Table ── */}
+          {activeTab === "inventory" && (
+            <div className="bg-[#111111] border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="border-b border-white/5">
+                      <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">Vehicle</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">Year</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">Price</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">Status</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-widest text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/4">
+                    {vehicles.map((v) => (
+                      <tr key={v.id} className="hover:bg-white/2 transition-colors group">
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-4">
+                            <div className="w-14 h-10 rounded-lg overflow-hidden bg-black border border-white/5 flex-shrink-0">
+                              <img src={v.image} alt={v.name} className="w-full h-full object-cover" />
+                            </div>
+                            <span className="text-sm font-semibold text-white">{v.name}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-400">{v.year}</td>
+                        <td className="px-6 py-4">
+                          <span className="text-sm font-black text-premiumRed">Ksh {v.price}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-full border ${
+                            v.status === "sold"
+                              ? "bg-red-500/10 text-red-400 border-red-500/20"
+                              : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                          }`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${v.status === "sold" ? "bg-red-400" : "bg-emerald-400"}`} />
+                            {v.status || "available"}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => handleMarkSold(v.id, v.status)}
+                              title={v.status === "sold" ? "Mark Available" : "Mark Sold"}
+                              className="p-2 rounded-lg text-gray-500 hover:text-emerald-400 hover:bg-emerald-400/10 transition-all duration-200"
+                            >
+                              {v.status === "sold" ? <RotateCcw className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
+                            </button>
+                            <button
+                              onClick={() => openModal(v)}
+                              className="p-2 rounded-lg text-gray-500 hover:text-blue-400 hover:bg-blue-400/10 transition-all duration-200"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(v.id)}
+                              className="p-2 rounded-lg text-gray-500 hover:text-premiumRed hover:bg-premiumRed/10 transition-all duration-200"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    {vehicles.length === 0 && (
+                      <tr>
+                        <td colSpan="5" className="px-6 py-16 text-center">
+                          <Car className="w-10 h-10 text-gray-700 mx-auto mb-3" />
+                          <p className="text-gray-500 text-sm">No vehicles in inventory.</p>
+                          <p className="text-gray-600 text-xs mt-1">Click "Add Vehicle" or seed initial data.</p>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* ── Messages ── */}
+          {activeTab === "messages" && (
+            <div className="space-y-4">
+              {messages.length === 0 ? (
+                <div className="bg-[#111111] border border-white/5 rounded-2xl py-20 text-center">
+                  <MessageSquare className="w-10 h-10 text-gray-700 mx-auto mb-3" />
+                  <p className="text-gray-500 text-sm">No customer messages yet.</p>
+                </div>
+              ) : (
+                messages.map(msg => (
+                  <div
+                    key={msg.id}
+                    className="bg-[#111111] border border-white/5 rounded-2xl p-6 hover:border-white/10 transition-colors"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
+                      <div className="flex items-center gap-4">
+                        {/* Avatar */}
+                        <div className="w-11 h-11 rounded-full bg-premiumRed/10 border border-premiumRed/20 flex items-center justify-center flex-shrink-0">
+                          <span className="text-premiumRed font-black text-sm">{msg.name?.[0]?.toUpperCase() || "?"}</span>
+                        </div>
+                        <div>
+                          <h3 className="text-white font-bold text-base leading-none">{msg.name}</h3>
+                          <div className="flex items-center gap-3 mt-1.5">
+                            <span className="flex items-center gap-1 text-premiumRed text-xs font-bold">
+                              <PhoneIcon className="w-3 h-3" /> {msg.phone}
+                            </span>
+                            {msg.email && (
+                              <span className="flex items-center gap-1 text-gray-500 text-xs">
+                                <Mail className="w-3 h-3" /> {msg.email}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-600 text-xs flex-shrink-0">
+                        <Clock className="w-3 h-3" />
+                        {msg.createdAt?.toDate ? msg.createdAt.toDate().toLocaleString() : "Just now"}
+                      </div>
+                    </div>
+                    {/* Divider */}
+                    <div className="h-px bg-white/5 mb-4" />
+                    <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap bg-black/30 rounded-xl px-4 py-3 border border-white/4">
+                      {msg.message}
+                    </p>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+
+        </main>
       </div>
 
-      {/* Modal */}
+      {/* ══ Modal ══ */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 rounded-xl p-6 w-full max-w-lg border border-gray-800 relative">
-            <h2 className="text-2xl font-bold text-white mb-6">
-              {editingVehicle ? 'Edit Vehicle' : 'Add New Vehicle'}
-            </h2>
-            <form onSubmit={handleFormSubmit} className="space-y-4">
-              <div>
-                <label className="block text-gray-400 text-xs uppercase mb-1">Name</label>
-                <input required type="text" className="w-full bg-black border border-gray-700 rounded p-2 text-white" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
-              </div>
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#111111] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl relative">
+            {/* Modal header */}
+            <div className="flex items-center justify-between px-7 py-5 border-b border-white/5">
+              <h2 className="text-white font-black text-lg">
+                {editingVehicle ? "Edit Vehicle" : "Add New Vehicle"}
+              </h2>
+              <button onClick={() => setIsModalOpen(false)} className="p-1.5 rounded-lg text-gray-500 hover:text-white hover:bg-white/8 transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal body */}
+            <form onSubmit={handleFormSubmit} className="px-7 py-6 space-y-5">
+              <Field label="Vehicle Name">
+                <input
+                  required type="text" className={inputCls}
+                  placeholder="e.g. Toyota Land Cruiser"
+                  value={formData.name}
+                  onChange={e => setFormData({ ...formData, name: e.target.value })}
+                />
+              </Field>
+
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-gray-400 text-xs uppercase mb-1">Year</label>
-                  <input required type="text" className="w-full bg-black border border-gray-700 rounded p-2 text-white" value={formData.year} onChange={e => setFormData({...formData, year: e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-gray-400 text-xs uppercase mb-1">Price (e.g. 4.2M)</label>
-                  <input required type="text" className="w-full bg-black border border-gray-700 rounded p-2 text-white" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} />
-                </div>
-              </div>
-              <div>
-                <label className="block text-gray-400 text-xs uppercase mb-1">Vehicle Image</label>
-                <div className="flex flex-col gap-2">
-                  <input 
-                    type="file" 
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="w-full bg-black border border-gray-700 rounded p-2 text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-premiumRed file:text-white hover:file:bg-red-700"
+                <Field label="Year">
+                  <input
+                    required type="text" className={inputCls}
+                    placeholder="e.g. 2019"
+                    value={formData.year}
+                    onChange={e => setFormData({ ...formData, year: e.target.value })}
                   />
-                  {uploadingImage && <span className="text-sm text-premiumRed">Uploading image...</span>}
-                  {formData.image && !uploadingImage && (
-                    <img src={formData.image} alt="Preview" className="h-32 object-cover rounded mt-2 border border-gray-700" />
-                  )}
-                  {/* Keep hidden input to ensure required validation passes */}
-                  <input type="hidden" required value={formData.image} />
-                </div>
+                </Field>
+                <Field label="Price">
+                  <input
+                    required type="text" className={inputCls}
+                    placeholder="e.g. 4.2M"
+                    value={formData.price}
+                    onChange={e => setFormData({ ...formData, price: e.target.value })}
+                  />
+                </Field>
               </div>
-              <div>
-                <label className="block text-gray-400 text-xs uppercase mb-1">Features (comma separated)</label>
-                <input required type="text" className="w-full bg-black border border-gray-700 rounded p-2 text-white" value={formData.features} onChange={e => setFormData({...formData, features: e.target.value})} />
-              </div>
-              <div className="flex justify-end gap-3 mt-6">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded text-gray-400 hover:text-white">Cancel</button>
-                <button disabled={uploadingImage} type="submit" className="bg-premiumRed hover:bg-red-700 px-4 py-2 rounded font-bold text-white disabled:opacity-50">
-                  {uploadingImage ? 'Uploading...' : 'Save Vehicle'}
+
+              <Field label="Vehicle Image">
+                <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-white/10 rounded-xl cursor-pointer hover:border-premiumRed/40 hover:bg-premiumRed/5 transition-all duration-300 relative overflow-hidden">
+                  {formData.image && !uploadingImage ? (
+                    <img src={formData.image} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                  ) : null}
+                  <div className="relative z-10 flex flex-col items-center gap-2">
+                    {uploadingImage ? (
+                      <>
+                        <div className="w-6 h-6 border-2 border-premiumRed border-t-transparent rounded-full animate-spin" />
+                        <span className="text-xs text-premiumRed font-semibold">Uploading…</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-6 h-6 text-gray-500" />
+                        <span className="text-xs text-gray-500">{formData.image ? "Click to replace" : "Click to upload image"}</span>
+                      </>
+                    )}
+                  </div>
+                  <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                </label>
+                <input type="hidden" required value={formData.image} />
+              </Field>
+
+              <Field label="Features (comma-separated)">
+                <input
+                  required type="text" className={inputCls}
+                  placeholder="e.g. 4WD, Sunroof, Leather"
+                  value={formData.features}
+                  onChange={e => setFormData({ ...formData, features: e.target.value })}
+                />
+              </Field>
+
+              {/* Footer */}
+              <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-5 py-2.5 text-sm text-gray-500 hover:text-white font-semibold transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={uploadingImage}
+                  className="flex items-center gap-2 px-6 py-2.5 bg-premiumRed hover:bg-red-600 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-premiumRed/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {uploadingImage ? "Uploading…" : editingVehicle ? "Save Changes" : "Add Vehicle"}
                 </button>
               </div>
             </form>
