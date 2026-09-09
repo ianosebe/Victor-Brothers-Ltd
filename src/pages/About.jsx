@@ -1,99 +1,62 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { ShieldCheck, Tags, ThumbsUp, Car } from 'lucide-react';
+﻿import React from "react";
+import { motion } from "framer-motion";
+import { Shield, Award, Users, Target } from "lucide-react";
+
+const fadeUp = { initial: { opacity: 0, y: 20 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true }, transition: { duration: 0.6 } };
 
 const About = () => {
-  const values = [
-    {
-      icon: <Car className="w-8 h-8 text-premiumRed" />,
-      title: "Premium Selection",
-      description: "We carefully source the finest pre-owned and refurbished vehicles, ensuring every car on our lot meets strict standards for performance and aesthetics."
-    },
-    {
-      icon: <Tags className="w-8 h-8 text-premiumRed" />,
-      title: "Absolute Value",
-      description: "Luxury and reliability shouldn't break the bank. We offer highly competitive, suitable prices so you can drive your dream car without compromise."
-    },
-    {
-      icon: <ShieldCheck className="w-8 h-8 text-premiumRed" />,
-      title: "Trusted Quality",
-      description: "Every vehicle undergoes rigorous mechanical inspection and detailing. When you buy from us, you buy with absolute confidence and peace of mind."
-    },
-    {
-      icon: <ThumbsUp className="w-8 h-8 text-premiumRed" />,
-      title: "Customer First",
-      description: "We believe in building relationships, not just making sales. Our team is dedicated to giving you a seamless, transparent, and joyful buying experience."
-    }
-  ];
-
   return (
-    <div className="pt-24 min-h-screen bg-premiumBlack px-4 sm:px-6 lg:px-8 pb-20">
-      <div className="max-w-7xl mx-auto">
-        
-        {/* Header Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-20 mt-10"
-        >
-          <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6 uppercase tracking-wider">
-            About <span className="text-premiumRed">Us</span>
-          </h1>
-          <div className="w-24 h-1 bg-premiumRed mx-auto rounded-full mb-8"></div>
-          
-          <p className="text-gray-300 max-w-3xl mx-auto text-lg md:text-xl leading-relaxed">
-            At <strong className="text-white">Victor & Brother's Ltd</strong>, we believe that driving a phenomenal car should be an accessible reality, not a distant dream. 
-            We specialize in delivering exceptionally clean, high-quality <span className="text-premiumRed font-semibold">refurbished and pre-owned vehicles</span> that look, feel, and drive like new. 
-            By bridging the gap between top-tier automotive quality and absolutely suitable prices, we ensure that you never have to compromise on style or reliability.
-          </p>
-        </motion.div>
+    <div className="min-h-screen bg-premiumBlack pt-24 pb-20">
+      {/* Hero */}
+      <section className="relative overflow-hidden mb-20 py-20 border-b border-white/5">
+        <div className="absolute inset-0 bg-premiumRed/5 blur-[100px] rounded-full pointer-events-none" />
+        <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
+          <motion.div {...fadeUp}>
+            <p className="text-premiumRed text-xs font-bold tracking-[0.3em] uppercase mb-4">Our Story</p>
+            <h1 className="text-4xl md:text-6xl font-black text-white mb-6 leading-tight">Driven by <span className="text-premiumRed">Excellence.</span></h1>
+            <p className="text-gray-400 text-lg leading-relaxed">Victor & Brothers Ltd was founded with a single mission: to redefine the pre-owned automotive market in Kenya by delivering uncompromised quality, transparency, and premium service.</p>
+          </motion.div>
+        </div>
+      </section>
 
-        {/* Why Choose Us Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {values.map((value, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.15 }}
-              className="bg-gray-900 border border-gray-800 rounded-2xl p-8 hover:bg-gray-800 transition-colors duration-300 group"
-            >
-              <div className="bg-black/50 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                {value.icon}
-              </div>
-              <h3 className="text-xl font-bold text-white mb-3">{value.title}</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                {value.description}
-              </p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-24">
+        {/* Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {[
+            { v: "5+", l: "Years Active" }, { v: "50+", l: "Vehicles Sold" },
+            { v: "100%", l: "Verified History" }, { v: "24/7", l: "Client Support" }
+          ].map((s, i) => (
+            <motion.div key={i} {...fadeUp} transition={{ delay: i * 0.1 }} className="bg-[#111] border border-white/5 rounded-3xl p-8 text-center">
+              <h3 className="text-4xl font-black text-premiumRed mb-2">{s.v}</h3>
+              <p className="text-gray-500 text-xs uppercase tracking-widest">{s.l}</p>
             </motion.div>
           ))}
         </div>
 
-        {/* Closing Statement */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="mt-24 bg-gradient-to-r from-gray-900 via-black to-gray-900 border border-gray-800 rounded-3xl p-10 md:p-16 text-center shadow-2xl relative overflow-hidden"
-        >
-          {/* Subtle background red glow */}
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full bg-premiumRed/5 blur-[100px] pointer-events-none"></div>
-          
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 relative z-10">
-            Ready to find your perfect ride?
-          </h2>
-          <p className="text-gray-400 max-w-2xl mx-auto mb-10 text-lg relative z-10">
-            Browse our extensive collection of carefully vetted vehicles and drive away with confidence. Exceptional quality is just a click away.
-          </p>
-          <a href="/models" className="inline-block bg-premiumRed text-white font-bold tracking-wider uppercase px-8 py-4 rounded-full hover:bg-red-700 transition-colors duration-300 shadow-lg shadow-premiumRed/30 relative z-10">
-            Explore Our Models
-          </a>
-        </motion.div>
-
+        {/* Pillars */}
+        <div>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-black text-white">Our Core Values</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[
+              { i: Shield, t: "Unmatched Integrity", d: "Every vehicle is thoroughly inspected, and its history is fully disclosed. No hidden flaws." },
+              { i: Award, t: "Premium Quality", d: "We source only the best. If it doesn't meet our rigorous standards, it doesn't make it to our showroom." },
+              { i: Users, t: "Customer First", d: "Your satisfaction is our benchmark. We guide you through the process tailored to your needs." },
+              { i: Target, t: "Long-Term Relationships", d: "We don't just sell cars; we aim to be your lifelong automotive partner." }
+            ].map((p, i) => (
+              <motion.div key={i} {...fadeUp} transition={{ delay: i * 0.1 }} className="bg-white/5 border border-white/10 rounded-3xl p-8 flex gap-6">
+                <div className="w-12 h-12 rounded-xl bg-premiumRed/10 border border-premiumRed/20 flex items-center justify-center flex-shrink-0"><p.i className="w-6 h-6 text-premiumRed" /></div>
+                <div>
+                  <h4 className="text-white font-bold text-lg mb-2">{p.t}</h4>
+                  <p className="text-gray-400 text-sm leading-relaxed">{p.d}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
 };
-
 export default About;

@@ -279,7 +279,7 @@ const Home = () => {
             <div>
               <img src="/vb-logo.png" alt="Victor & Brothers Ltd" className="h-14 w-auto object-contain mb-5" style={{ mixBlendMode: "lighten" }} />
               <p className="text-gray-500 text-sm leading-relaxed max-w-xs">
-                Uganda's trusted premium secondhand vehicle dealership. Quality, transparency, and service � since day one.
+                Kenya's trusted premium secondhand vehicle dealership. Quality, transparency, and service � since day one.
               </p>
               <div className="flex gap-3 mt-6">
                 {["FB", "IG", "WA"].map((s) => (
