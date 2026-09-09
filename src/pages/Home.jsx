@@ -222,7 +222,7 @@ const Home = () => {
                 transition={{ duration: 0.6, delay: 0.5 }}
                 className="absolute -bottom-6 -left-6 z-20 bg-[#111111] border border-white/10 rounded-2xl px-6 py-4 shadow-2xl"
               >
-                <p className="text-4xl font-black text-premiumRed leading-none">10+</p>
+                <p className="text-4xl font-black text-premiumRed leading-none">5+</p>
                 <p className="text-xs text-gray-400 mt-1 uppercase tracking-widest">Years of Trust</p>
               </motion.div>
               <motion.div
@@ -236,7 +236,7 @@ const Home = () => {
                   {[...Array(5)].map((_, i) => (<Star key={i} className="w-4 h-4 fill-premiumRed text-premiumRed" />))}
                 </div>
                 <div>
-                  <p className="text-white text-sm font-bold">4.9 / 5.0</p>
+                  <p className="text-white text-sm font-bold">4.5/ 5.0</p>
                   <p className="text-gray-500 text-[10px] uppercase tracking-wider">Client Rating</p>
                 </div>
               </motion.div>

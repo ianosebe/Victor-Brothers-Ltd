@@ -41,9 +41,8 @@ const Contact = () => {
             <div className="bg-[#111] border border-white/5 rounded-3xl p-8">
               <h3 className="text-xl font-bold text-white mb-6">Showroom Details</h3>
               <div className="space-y-6">
-                <div className="flex gap-4"><MapPin className="w-6 h-6 text-premiumRed flex-shrink-0" /><div><p className="text-white font-bold mb-1">Address</p><p className="text-gray-500 text-sm">Plot 45, Industrial Area<br/>Kampala, Uganda</p></div></div>
-                <div className="flex gap-4"><Phone className="w-6 h-6 text-premiumRed flex-shrink-0" /><div><p className="text-white font-bold mb-1">Phone</p><p className="text-gray-500 text-sm">+256 700 000 000</p></div></div>
-                <div className="flex gap-4"><Mail className="w-6 h-6 text-premiumRed flex-shrink-0" /><div><p className="text-white font-bold mb-1">Email</p><p className="text-gray-500 text-sm">info@victorandbros.ug</p></div></div>
+                <div className="flex gap-4"><Phone className="w-6 h-6 text-premiumRed flex-shrink-0" /><div><p className="text-white font-bold mb-1">Phone</p><p className="text-gray-500 text-sm">+254 748 448411</p></div></div>
+                <div className="flex gap-4"><Mail className="w-6 h-6 text-premiumRed flex-shrink-0" /><div><p className="text-white font-bold mb-1">Email</p><p className="text-gray-500 text-sm"> osorovictor375@gmail.com</p></div></div>
                 <div className="flex gap-4"><Clock className="w-6 h-6 text-premiumRed flex-shrink-0" /><div><p className="text-white font-bold mb-1">Business Hours</p><p className="text-gray-500 text-sm">Mon - Sat: 8:00 AM - 6:00 PM<br/>Sunday: Closed</p></div></div>
               </div>
             </div>
